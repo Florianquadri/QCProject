@@ -28,4 +28,6 @@ Les données utilisées dans le fichier CSV servent aux acteurs majeurs de la fi
 
 Sur Twitter, les gens s'amusent également par exemple à montrer un tweet d'Elon Musk et son impact sur le dogeCoin par exemple (quand il y en a un).
 
-//Questions
+//Lien FIGMA
+https://www.figma.com/file/EaNxjov2pnnyNZx2CutXwn/QCProject?node-id=0%3A1
+
