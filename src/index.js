@@ -78,16 +78,14 @@ d3.csv('/btc.csv')
 
         /*         let test = d3.line().x(function (d) { return x(d.date) });
                 console.log(test); */
-
-        groupeAAppend.append("path")
-
+groupeAAppend.append("path")
             .datum(tabPrixBTC)
             .attr("fill", "none")
             .attr("stroke", "steelblue")
             .attr("stroke-width", 1.5)
             .attr("d", d3.line()
                 //j'aimerais prendre les datas de tabPrixBTC
-                .x(function (d) { return echelleDate(d.date) })
+                .x(function (d) { return echelleDate(d3.timeParse("%Y-%m-%d")(d.date)) })
                 .y(function (d) { return echellePrix(d.prix_btc) })
             )
 
