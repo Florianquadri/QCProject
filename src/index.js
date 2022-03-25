@@ -1,4 +1,6 @@
 import * as d3 from 'd3';
+//https://www.youtube.com/watch?v=T1X6qQt9ONg pour le crash
+
 /* import * as d4 from "https://d3js.org/d3.v4.js"; */
 
 //24 mars 2021 tweet tesla accepte btc
@@ -25,10 +27,10 @@ d3.csv('/btc.csv')
         //1 : créer marges et taille SVG
 
         const margin = {
-            top: 20, right: 50, bottom: 20, left: 50
+            top: 50, right: 50, bottom: 50, left: 50
         },
-            width = 1000 - margin.left - margin.right,
-            height = 600 - margin.top - margin.bottom;
+            width = window.innerWidth - margin.left - margin.right,
+            height = window.innerHeight - margin.top - margin.bottom;
 
 
         const divTest = d3.select("#testDonnees");
@@ -94,7 +96,7 @@ d3.csv('/btc.csv')
 
         //cercles sur la courbe
 
-        let Tooltip = groupeAAppend.append("div")
+        let Tooltip = divTest.append("div")
             .style("opacity", 0)
             .attr("class", "tooltip")
             .attr("width", "50px")
@@ -105,48 +107,79 @@ d3.csv('/btc.csv')
             .style("border-radius", "5px")
             .style("padding", "5px")
 
-        let mouseover = function (d,i) {
-
-            Tooltip.html(d)  
-            .style("left", d3.select(this).attr("cx") + "px")     
-            .style("top", d3.select(this).attr("cy") + "px")
-            .style("opacity", 1)
-            .html("Exact value: " + prix)
-
-                let prix = d3.select(this).attr("price")
-                console.log(prix)
-
- /*                let matrix = this.getScreenCTM()
-                .translate(+ this.getAttribute("cx"), + this.getAttribute("cy"));
-            Tooltip.html(d)
-                .style("left", (window.pageXOffset + matrix.e + 15) + "px")
-                .style("top", (window.pageYOffset + matrix.f - 30) + "px")
-                .style("opacity", 1)
+        let mouseover = function (d, i) {
 
             let prix = d3.select(this).attr("price")
-            console.log(prix) */
+            let srcTweet = d3.select(this).attr("linkTweet");
+            let dateTweet = d3.select(this).attr("date");
+            console.log(prix)
+
+            Tooltip.html(d)
+                .style("left", d3.select(this).attr("cx") + "px")
+                .style("top", d3.select(this).attr("cy") + "px")
+                .style("opacity", 1)
+                .html("Prix bitcoin: " + prix + "<br>" + srcTweet + "<br>" + dateTweet)
+
+            monSVG.append('g').attr("id", "img")
+                .append("svg:image")
+                .attr("xlink:href", srcTweet)
+                .attr("width", 300)
+                .attr("height", 300)
+                .attr("x", d3.select(this).attr("cx") - 300)
+                .attr("y", d3.select(this).attr("cy") - 150);
         }
 
-        let mousemove = function (d,i) {
-
+        let mousemove = function (d, i) {
+            let dateTweet = d3.select(this).attr("date");
             let prix = d3.select(this).attr("price")
+            let srcTweet = d3.select(this).attr("linkTweet");
 
 
             Tooltip
-                .html("Exact value: " + prix)
+                .html("Prix bitcoin: " + prix + "<br>" + srcTweet + "<br>" + dateTweet)
                 .style("left", (d3.pointer(this)[0] + 70) + "px")
                 .style("top", (d3.pointer(this)[1]) + "px")
         }
 
-        let mouseleave = function (d,i) {
+        let mouseleave = function (d, i) {
             Tooltip
                 .style("opacity", 0)
+
+            d3.select("#img").remove();
         }
 
         //test avec tableau de tweet --> il faudra que ce soit dans doc CSV à appeler
         let dataTweet = [
+            { date: '2009-01-11', src: "/runningBitcoin.png" },
+            { date: '2010-05-22', src: "/pizzaBtc.png" },
+            { date: '2010-07-20', src: "/anyoneusingbtc.png" },
+            { date: '2011-01-14', src: "/firstArticle.png" },
+            { date: '2011-05-11', src: "/pari.png" },
+            { date: '2011-05-16', src: "/hype.png" },
+            { date: '2011-05-17', src: "/wish.png" },
+            { date: '2011-06-08', src: "/probleme1.png" },
+            { date: '2011-06-19', src: "/crash1.png" },
+            { date: '2011-11-20', src: "/interview.png" },
+            { date: '2012-01-12', src: "/machinebtc.png" },
+            { date: '2013-01-15', src: "/hope.png" },
+            { date: '2013-04-03', src: "/mining.png" },
+            { date: '2013-05-05', src: "/rarete.png" },
+            { date: '2013-08-15', src: "/coinbasesms.png" },
+            { date: '2013-10-02', src: "/probleme2.png" },
+            { date: '2013-12-05', src: "/firstpaiement.png" },
+            { date: '2013-12-13', src: "/everybody1.png" },
+            { date: '2014-04-02', src: "/cake.png" },
+            { date: '2014-04-13', src: "/eth.png" },
+            { date: '2018-01-25', src: "/katyPerry.png" },
+            { date: '2020-09-10', src: "/jackDorsey.png" },
+            { date: '2021-01-29', src: "/biobitcoin.png" },
+            { date: '2021-02-01', src: "/massAdoption.png" },
             { date: '2021-03-24', src: "/tweetTeslaAcceptBtc.png" },
-            { date: '2021-05-13', src: "/tteslarefusebtc.png" }
+            { date: '2021-03-29', src: "/stillDip.png" },
+            { date: '2021-05-13', src: "/teslarefusebtc.png" },
+            //hyper important car il tweet à 10h42 et à 13h crash du 19 mai
+            { date: '2021-05-19', src: "/teslaDiamond.png" },
+            { date: '2021-09-07', src: "/salvadorStart.png" }
         ];
         //tableau de données des tweets final, créé en cherchant les dates identiques aux données du tabPrixBTC et du tab des tweets
 
@@ -162,7 +195,9 @@ d3.csv('/btc.csv')
             .attr("class", "myCircle")
             .attr("cx", function (d) { return echelleDate(d3.timeParse("%Y-%m-%d")(d.date)) })
             .attr("cy", function (d) { return echellePrix(d.prix_btc) })
-            .attr("price", function (d) { return d.prix_btc})
+            .attr("price", function (d) { return d.prix_btc })
+            .attr("linkTweet", function (d) { return d.src })
+            .attr("date", function (d) { return d.date })
             .attr("r", 8)
             .attr("stroke", "#69b3a2")
             .attr("stroke-width", 3)
@@ -181,7 +216,7 @@ function matcherDatesTabPrixBtcEtTabTweet(dataTweet, tabPrixBTC) {
     dataTweet.forEach((e) => {
 
         let found = tabPrixBTC.find(el => el.date == e.date);
-        tabCroise.push(found);
+        tabCroise.push({ date: found.date, prix_btc: found.prix_btc, marketCap: found.marketCap, src: e.src });
 
     })
     return tabCroise;
@@ -189,4 +224,5 @@ function matcherDatesTabPrixBtcEtTabTweet(dataTweet, tabPrixBTC) {
 }
 
 
+//faire zoom pour voir + détaillé (date + proche) et faire scroll pour avancer puis faire apparaître tweet
 
