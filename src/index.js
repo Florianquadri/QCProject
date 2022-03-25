@@ -1,4 +1,7 @@
 import * as d3 from 'd3';
+/* import * as d4 from "https://d3js.org/d3.v4.js"; */
+
+//24 mars 2021 tweet tesla accepte btc
 
 console.log("hello");
 //prendre colonne BQ, PriceUSD
@@ -53,7 +56,7 @@ d3.csv('/btc.csv')
 
         const echelleDate = d3.scaleTime()
             //.domain(d3.extent(tabPrixBTC, function (d) { return d.date }))
-            .domain(d3.extent(tabPrixBTC, function (d) { return d3.timeParse("%Y-%m-%d")(d.date)}))
+            .domain(d3.extent(tabPrixBTC, function (d) { return d3.timeParse("%Y-%m-%d")(d.date) }))
             //[new Date(Number(prixStartSepare[0]), Number(prixStartSepare[1]), Number(prixStartSepare[2])), new Date(Number(prixEndSepare[0]), Number(prixEndSepare[1]), Number(prixEndSepare[2]))]
             //.domain([new Date(tabPrixBTC[0].date), new Date(tabPrixBTC[tabPrixBTC.length-1].date)])
             .range([0, width])
@@ -78,7 +81,7 @@ d3.csv('/btc.csv')
 
         /*         let test = d3.line().x(function (d) { return x(d.date) });
                 console.log(test); */
-groupeAAppend.append("path")
+        groupeAAppend.append("path")
             .datum(tabPrixBTC)
             .attr("fill", "none")
             .attr("stroke", "steelblue")
@@ -89,12 +92,101 @@ groupeAAppend.append("path")
                 .y(function (d) { return echellePrix(d.prix_btc) })
             )
 
+        //cercles sur la courbe
+
+        let Tooltip = groupeAAppend.append("div")
+            .style("opacity", 0)
+            .attr("class", "tooltip")
+            .attr("width", "50px")
+            .attr("height", "30px")
+            .style("background-color", "white")
+            .style("border", "solid")
+            .style("border-width", "2px")
+            .style("border-radius", "5px")
+            .style("padding", "5px")
+
+        let mouseover = function (d,i) {
+
+            Tooltip.html(d)  
+            .style("left", d3.select(this).attr("cx") + "px")     
+            .style("top", d3.select(this).attr("cy") + "px")
+            .style("opacity", 1)
+            .html("Exact value: " + prix)
+
+                let prix = d3.select(this).attr("price")
+                console.log(prix)
+
+ /*                let matrix = this.getScreenCTM()
+                .translate(+ this.getAttribute("cx"), + this.getAttribute("cy"));
+            Tooltip.html(d)
+                .style("left", (window.pageXOffset + matrix.e + 15) + "px")
+                .style("top", (window.pageYOffset + matrix.f - 30) + "px")
+                .style("opacity", 1)
+
+            let prix = d3.select(this).attr("price")
+            console.log(prix) */
+        }
+
+        let mousemove = function (d,i) {
+
+            let prix = d3.select(this).attr("price")
+
+
+            Tooltip
+                .html("Exact value: " + prix)
+                .style("left", (d3.pointer(this)[0] + 70) + "px")
+                .style("top", (d3.pointer(this)[1]) + "px")
+        }
+
+        let mouseleave = function (d,i) {
+            Tooltip
+                .style("opacity", 0)
+        }
+
+        //test avec tableau de tweet --> il faudra que ce soit dans doc CSV à appeler
+        let dataTweet = [
+            { date: '2021-03-24', src: "/tweetTeslaAcceptBtc.png" },
+            { date: '2021-05-13', src: "/tteslarefusebtc.png" }
+        ];
+        //tableau de données des tweets final, créé en cherchant les dates identiques aux données du tabPrixBTC et du tab des tweets
+
+        let datasTweetFinal = matcherDatesTabPrixBtcEtTabTweet(dataTweet, tabPrixBTC)
+        console.log(datasTweetFinal)
+
+
+        groupeAAppend.append("g")
+            .selectAll("dot")
+            .data(datasTweetFinal)
+            .enter()
+            .append("circle")
+            .attr("class", "myCircle")
+            .attr("cx", function (d) { return echelleDate(d3.timeParse("%Y-%m-%d")(d.date)) })
+            .attr("cy", function (d) { return echellePrix(d.prix_btc) })
+            .attr("price", function (d) { return d.prix_btc})
+            .attr("r", 8)
+            .attr("stroke", "#69b3a2")
+            .attr("stroke-width", 3)
+            .attr("fill", "white")
+            .on("mouseover", mouseover)
+            .on("mousemove", mousemove)
+            .on("mouseleave", mouseleave)
+
     })
     .catch(function (err) {
 
     })
 
+function matcherDatesTabPrixBtcEtTabTweet(dataTweet, tabPrixBTC) {
+    let tabCroise = [];
+    dataTweet.forEach((e) => {
 
+        let found = tabPrixBTC.find(el => el.date == e.date);
+        tabCroise.push(found);
+
+    })
+    return tabCroise;
+
+}
 
 
 
