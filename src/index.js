@@ -152,6 +152,7 @@ d3.csv('/btc.csv')
         let dataTweet = [
             { date: '2009-01-11', src: "/runningBitcoin.png" },
             { date: '2010-05-22', src: "/pizzaBtc.png" },
+            { date: '2010-12-14', src: "/bitcoinWikipedia.png" },
             { date: '2010-07-20', src: "/anyoneusingbtc.png" },
             { date: '2011-01-14', src: "/firstArticle.png" },
             { date: '2011-05-11', src: "/pari.png" },
@@ -170,6 +171,7 @@ d3.csv('/btc.csv')
             { date: '2013-12-13', src: "/everybody1.png" },
             { date: '2014-04-02', src: "/cake.png" },
             { date: '2014-04-13', src: "/eth.png" },
+            { date: '2018-01-25', src: "/katyPerry.png" },//
             { date: '2018-01-25', src: "/katyPerry.png" },
             { date: '2020-09-10', src: "/jackDorsey.png" },
             { date: '2021-01-29', src: "/biobitcoin.png" },
