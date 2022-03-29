@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import {retourneTabTweet} from './dataTweet.js'
+import { retourneTabTweet } from './dataTweet.js'
 //https://www.youtube.com/watch?v=T1X6qQt9ONg pour le crash
 
 /* import * as d4 from "https://d3js.org/d3.v4.js"; */
@@ -113,13 +113,14 @@ d3.csv('/btc.csv')
             let prix = d3.select(this).attr("price")
             let srcTweet = d3.select(this).attr("linkTweet");
             let dateTweet = d3.select(this).attr("date");
+            let tweetEmb = d3.select(this).attr("linkTweetEmb");
             console.log(prix)
 
             Tooltip.html(d)
                 .style("left", d3.select(this).attr("cx") + "px")
                 .style("top", d3.select(this).attr("cy") + "px")
                 .style("opacity", 1)
-                .html("Prix bitcoin: " + prix + "<br>" + srcTweet + "<br>" + dateTweet)
+                .html("Prix bitcoin: " + prix + "<br>" + srcTweet + "<br>" + dateTweet + "<br>" + tweetEmb)
 
             monSVG.append('g').attr("id", "img")
                 .append("svg:image")
@@ -134,10 +135,11 @@ d3.csv('/btc.csv')
             let dateTweet = d3.select(this).attr("date");
             let prix = d3.select(this).attr("price")
             let srcTweet = d3.select(this).attr("linkTweet");
+            let tweetEmb = d3.select(this).attr("linkTweetEmb");
 
 
             Tooltip
-                .html("Prix bitcoin: " + prix + "<br>" + srcTweet + "<br>" + dateTweet)
+                .html("Prix bitcoin: " + prix + "<br>" + srcTweet + "<br>" + dateTweet + "<br>" + tweetEmb)
                 .style("left", (d3.pointer(this)[0] + 70) + "px")
                 .style("top", (d3.pointer(this)[1]) + "px")
         }
@@ -167,6 +169,7 @@ d3.csv('/btc.csv')
             .attr("cy", function (d) { return echellePrix(d.prix_btc) })
             .attr("price", function (d) { return d.prix_btc })
             .attr("linkTweet", function (d) { return d.src })
+            .attr("linkTweetEmb", function (d) { return d.linkTweet })
             .attr("date", function (d) { return d.date })
             .attr("r", 8)
             .attr("stroke", "#69b3a2")
@@ -181,17 +184,17 @@ d3.csv('/btc.csv')
 
     })
 
-    function matcherDatesTabPrixBtcEtTabTweet(dataTweet, tabPrixBTC) {
-        let tabCroise = [];
-        dataTweet.forEach((e) => {
-    
-            let found = tabPrixBTC.find(el => el.date == e.date);
-            tabCroise.push({ date: found.date, prix_btc: found.prix_btc, marketCap: found.marketCap, src: e.src, linkTweet: e.linkTweet });
-    
-        })
-        return tabCroise;
-    
-    }
+function matcherDatesTabPrixBtcEtTabTweet(dataTweet, tabPrixBTC) {
+    let tabCroise = [];
+    dataTweet.forEach((e) => {
+
+        let found = tabPrixBTC.find(el => el.date == e.date);
+        tabCroise.push({ date: found.date, prix_btc: found.prix_btc, marketCap: found.marketCap, src: e.src, linkTweet: e.linkTweet });
+
+    })
+    return tabCroise;
+
+}
 
 
 //faire zoom pour voir + détaillé (date + proche) et faire scroll pour avancer puis faire apparaître tweet
