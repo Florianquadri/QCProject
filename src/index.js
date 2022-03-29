@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+import {retourneTabTweet} from './dataTweet.js'
 //https://www.youtube.com/watch?v=T1X6qQt9ONg pour le crash
 
 /* import * as d4 from "https://d3js.org/d3.v4.js"; */
@@ -148,7 +149,8 @@ d3.csv('/btc.csv')
             d3.select("#img").remove();
         }
 
-       
+        //test avec tableau de tweet --> il faudra que ce soit dans doc CSV à appeler
+        let dataTweet = retourneTabTweet();
         //tableau de données des tweets final, créé en cherchant les dates identiques aux données du tabPrixBTC et du tab des tweets
 
         let datasTweetFinal = matcherDatesTabPrixBtcEtTabTweet(dataTweet, tabPrixBTC)
@@ -179,17 +181,17 @@ d3.csv('/btc.csv')
 
     })
 
-function matcherDatesTabPrixBtcEtTabTweet(dataTweet, tabPrixBTC) {
-    let tabCroise = [];
-    dataTweet.forEach((e) => {
-
-        let found = tabPrixBTC.find(el => el.date == e.date);
-        tabCroise.push({ date: found.date, prix_btc: found.prix_btc, marketCap: found.marketCap, src: e.src });
-
-    })
-    return tabCroise;
-
-}
+    function matcherDatesTabPrixBtcEtTabTweet(dataTweet, tabPrixBTC) {
+        let tabCroise = [];
+        dataTweet.forEach((e) => {
+    
+            let found = tabPrixBTC.find(el => el.date == e.date);
+            tabCroise.push({ date: found.date, prix_btc: found.prix_btc, marketCap: found.marketCap, src: e.src, linkTweet: e.linkTweet });
+    
+        })
+        return tabCroise;
+    
+    }
 
 
 //faire zoom pour voir + détaillé (date + proche) et faire scroll pour avancer puis faire apparaître tweet
