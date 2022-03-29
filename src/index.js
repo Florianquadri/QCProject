@@ -160,6 +160,7 @@ d3.csv('/btc.csv')
             { date: '2011-05-17', src: "/wish.png" },
             { date: '2011-06-08', src: "/probleme1.png" },
             { date: '2011-06-19', src: "/crash1.png" },
+            
             { date: '2011-11-20', src: "/interview.png" },
             { date: '2012-01-12', src: "/machinebtc.png" },
             { date: '2013-01-15', src: "/hope.png" },
