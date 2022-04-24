@@ -232,14 +232,14 @@ d3.csv('/btc.csv')
 
         // Zoom
         const zoom = d3.zoom()
-            .scaleExtent([1, 20])
+            .scaleExtent([1, 10])
             .extent([[0, 0], [width, height]])
             .on("zoom", handleZoom);
 
 
         // append zoom area and apply zoom functions
         monSVG.call(zoom)
-            .on("dblclick.zoom",resetZoom)
+            .on("click.zoom",resetZoom)
 
 
     })
