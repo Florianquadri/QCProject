@@ -41,6 +41,12 @@ let dataTweet = [
     { date: '2021-05-19', src: "/teslaDiamond.png", linkTweet:"https://twitter.com/elonmusk/status/1395027147161489412?s=20&t=w3yTGmBq8O8SNdlgSz3Z1Q" },
     { date: '2021-06-13', src: "/hopeElon.png", linkTweet:"https://twitter.com/elonmusk/status/1404132183254523905?s=20&t=24OFMQsTaI8rHufVnRLikQ" },
     { date: '2021-09-07', src: "/salvadorStart.png", linkTweet:"https://twitter.com/nayibbukele/status/1435120030245662722?s=20&t=IDisU_E0ATXzhV5Gl7r-tw" },
+    { date: '2021-10-23', src: "/imagine.png", linkTweet:"https://twitter.com/100trillionUSD/status/1454039384915910656?s=20&t=viY2PopHTUGmyxDIjZUrng" },
+    { date: '2021-10-25', src: "/reserve.png", linkTweet:"https://twitter.com/BitcoinMagazine/status/1452682979902361600?s=20&t=viY2PopHTUGmyxDIjZUrng" },
+    { date: '2021-10-27', src: "/buythedip.png", linkTweet:"https://twitter.com/nayibbukele/status/1453461587948445697?s=20&t=viY2PopHTUGmyxDIjZUrng"},
+    { date: '2021-11-07', src: "/courbe.png", linkTweet:"https://twitter.com/TechDev_52/status/1457404146764627974?s=20&t=viY2PopHTUGmyxDIjZUrng" },
+    { date: '2021-11-08', src: "/mastercard.png", linkTweet:"https://twitter.com/BTC_Archive/status/1457812725732630540?s=20&t=viY2PopHTUGmyxDIjZUrng"},
+    { date: '2021-11-09', src: "/apple.png", linkTweet:"https://twitter.com/APompliano/status/1458093788644188178?s=20&t=viY2PopHTUGmyxDIjZUrng"},
     { date: '2021-12-21', src: "/replaceDollar.png", linkTweet:"https://twitter.com/iamcardib/status/1473087732486270978?s=20&t=v1844LtXLAF5HrZVSgL5bw" }
 ];
 

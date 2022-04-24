@@ -80,11 +80,60 @@ d3.csv('/btc.csv')
         groupeAAppend.append('g')
             .call(axeXPrix);
 
+        let zoom = d3.zoom()
+            .on('zoom', handleZoom);
+
+        zoom.scaleExtent([0.1, 10]);
+
+        function handleZoom(e) {
+            monSVG.attr('transform', e.transform);
+        }
+
+        /*       monSVG.call(zoom
+                   )  */
+
+        monSVG.on('click', function () {
+            // Smooth zooming
+            zoom.scaleTo(monSVG.transition().duration(750), 1);
+        });
+
+        monSVG.on('dblclick', function (e) {
+            // Smooth zooming
+            zoom.scaleTo(monSVG.transition().duration(750), 3);
+        });
+
+
+        let brush = d3.brush()
+            .on('brush', handleBrush);
+
+        let brushExtent;
+
+        function handleBrush(e) {
+
+            brushExtent = e.selection();
+        }
+
+        monSVG.call(brush);
+
+        var clip = monSVG.append("defs").append("svg:clipPath")
+            .attr("id", "clip")
+            .append("svg:rect")
+            .attr("width", width)
+            .attr("height", height)
+            .attr("x", 0)
+            .attr("y", 0);
+
         //ajouter la ligne
 
         /*         let test = d3.line().x(function (d) { return x(d.date) });
                 console.log(test); */
-        groupeAAppend.append("path")
+
+        let groupePath = groupeAAppend.append("g").attr("class", "chart")
+        groupePath.call(zoom);
+
+
+
+        groupePath.append("path")
             .datum(tabPrixBTC)
             .attr("fill", "none")
             .attr("stroke", "steelblue")
@@ -94,6 +143,8 @@ d3.csv('/btc.csv')
                 .x(function (d) { return echelleDate(d3.timeParse("%Y-%m-%d")(d.date)) })
                 .y(function (d) { return echellePrix(d.prix_btc) })
             )
+
+
 
         //cercles sur la courbe
 
@@ -159,7 +210,7 @@ d3.csv('/btc.csv')
         console.log(datasTweetFinal)
 
 
-        groupeAAppend.append("g")
+        groupePath.append("g")
             .selectAll("dot")
             .data(datasTweetFinal)
             .enter()
@@ -199,3 +250,18 @@ function matcherDatesTabPrixBtcEtTabTweet(dataTweet, tabPrixBTC) {
 
 //faire zoom pour voir + détaillé (date + proche) et faire scroll pour avancer puis faire apparaître tweet
 
+//ou faire pan + zoom sur la zone sélectionnée
+
+/* function rescaleX(x) {
+    var range = x.range().map(transform.invertX, transform),
+        domain = range.map(x.invert, x);
+    return x.copy().domain(domain);
+  }
+
+  function rescaleY(y) {
+    var range = y.range().map(transform.invertY, transform),
+        domain = range.map(y.invert, y);
+    return y.copy().domain(domain);
+  }
+
+  d3.ZoomTransform(k, x, y) */
