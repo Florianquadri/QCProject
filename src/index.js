@@ -225,10 +225,6 @@ d3.csv('/btc.csv')
         }
 
 
-        const resetZoom = () => {
-            monSVG.transition().duration(750).call(zoom.transform, d3.zoomIdentity.scale(1))
-        }
-
 
         // Zoom
         const zoom = d3.zoom()
@@ -236,10 +232,19 @@ d3.csv('/btc.csv')
             .extent([[0, 0], [width, height]])
             .on("zoom", handleZoom);
 
+            const resetZoom = () => {
+                monSVG.transition().duration(750).call(zoom.transform, d3.zoomIdentity.scale(1))
+            }
+
+            const dbclick = () => {
+                monSVG.transition().duration(750).call(zoom.transform, d3.zoomIdentity.scale(8));
+            }
+
 
         // append zoom area and apply zoom functions
         monSVG.call(zoom)
             .on("click.zoom",resetZoom)
+            .on("dbclick.zoom",dbclick)
 
 
     })
