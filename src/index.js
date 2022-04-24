@@ -2,16 +2,12 @@ import * as d3 from 'd3';
 import { retourneTabTweet } from './dataTweet.js'
 //https://www.youtube.com/watch?v=T1X6qQt9ONg pour le crash
 
-/* import * as d4 from "https://d3js.org/d3.v4.js"; */
 
-//24 mars 2021 tweet tesla accepte btc
-
-console.log("hello");
-//prendre colonne BQ, PriceUSD
 d3.csv('/btc.csv')
 
     .then(function (data) {
 
+        // Manipulation de données
         const tabPrixBTC = data.map((d, i) => {
             let prixArrondi = Math.round(d.PriceUSD);
             //je reformate les variables dates
@@ -19,14 +15,15 @@ d3.csv('/btc.csv')
             let infosSelect = { date: d.time, prix_btc: prixArrondi, marketCap: d.CapMrktCurUSD }
             return infosSelect;
         })
+
         //j'enlève la dernière case du tableau car le prix, non actualisé, = 0
         tabPrixBTC.pop();
         //affiche le avant-après
         console.log(data)
         console.log(tabPrixBTC)
 
-        //1 : créer marges et taille SVG
 
+        //1 : créer marges et taille SVG
         const margin = {
             top: 50, right: 50, bottom: 50, left: 50
         },
@@ -36,8 +33,7 @@ d3.csv('/btc.csv')
 
         const divTest = d3.select("#testDonnees");
         let monSVG = divTest.append('svg');
-        /*         monSVG.call(axeYDate)
-                monSVG.call(axeXPrix) */
+
         monSVG.attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
             .append("g")
@@ -54,86 +50,72 @@ d3.csv('/btc.csv')
         let prixStartBTC = tabPrixBTC[0].date;
         let prixStartSepare = prixStartBTC.split('-');
         console.log(prixStartSepare)
+
         let prixEndBTC = tabPrixBTC[tabPrixBTC.length - 1].date;
         let prixEndSepare = prixEndBTC.split('-');
 
         const echelleDate = d3.scaleTime()
-            //.domain(d3.extent(tabPrixBTC, function (d) { return d.date }))
             .domain(d3.extent(tabPrixBTC, function (d) { return d3.timeParse("%Y-%m-%d")(d.date) }))
-            //[new Date(Number(prixStartSepare[0]), Number(prixStartSepare[1]), Number(prixStartSepare[2])), new Date(Number(prixEndSepare[0]), Number(prixEndSepare[1]), Number(prixEndSepare[2]))]
-            //.domain([new Date(tabPrixBTC[0].date), new Date(tabPrixBTC[tabPrixBTC.length-1].date)])
             .range([0, width])
-        //3 : creation axes
 
-        const axeYDate = d3.axisBottom(echelleDate);
-        const axeXPrix = d3.axisLeft(echellePrix);
+
+        //3 : creation axes
+        const axeXDate = d3.axisBottom(echelleDate);
+        const axeYPrix = d3.axisLeft(echellePrix);
 
 
         //append svg 
-        let groupeAAppend = monSVG.select('.gAAppend');
+        const groupeAAppend = monSVG.select('.gAAppend');
 
-        groupeAAppend.append('g')
+        const x = groupeAAppend.append('g')
             .attr("transform", "translate(0," + height + ")")
-            .call(axeYDate)
+            .call(axeXDate)
 
+        const y = groupeAAppend.append('g')
+            .call(axeYPrix);
 
-        groupeAAppend.append('g')
-            .call(axeXPrix);
+        // let brush = d3.brush()
+        //     .on('brush', handleBrush);
+        //
+        // let brushExtent;
+        //
+        // function handleBrush(e) {
+        //
+        //     brushExtent = e.selection();
+        // }
+        //
+        // monSVG.call(brush);
 
-        let zoom = d3.zoom()
-            .on('zoom', handleZoom);
-
-        zoom.scaleExtent([0.1, 10]);
-
-        function handleZoom(e) {
-            monSVG.attr('transform', e.transform);
-        }
-
-        /*       monSVG.call(zoom
-                   )  */
-
-        monSVG.on('click', function () {
-            // Smooth zooming
-            zoom.scaleTo(monSVG.transition().duration(750), 1);
-        });
-
-        monSVG.on('dblclick', function (e) {
-            // Smooth zooming
-            zoom.scaleTo(monSVG.transition().duration(750), 3);
-        });
-
-
-        let brush = d3.brush()
-            .on('brush', handleBrush);
-
-        let brushExtent;
-
-        function handleBrush(e) {
-
-            brushExtent = e.selection();
-        }
-
-        monSVG.call(brush);
-
-        var clip = monSVG.append("defs").append("svg:clipPath")
-            .attr("id", "clip")
-            .append("svg:rect")
-            .attr("width", width)
-            .attr("height", height)
-            .attr("x", 0)
-            .attr("y", 0);
+        // var clip = monSVG.append("defs").append("svg:clipPath")
+        //     .attr("id", "clip")
+        //     .append("svg:rect")
+        //     .attr("width", width)
+        //     .attr("height", height)
+        //     .attr("x", 0)
+        //     .attr("y", 0);
 
         //ajouter la ligne
-
-        /*         let test = d3.line().x(function (d) { return x(d.date) });
-                console.log(test); */
-
-        let groupePath = groupeAAppend.append("g").attr("class", "chart")
-        groupePath.call(zoom);
+        const groupePath = groupeAAppend.append("g").attr("class", "chart")
 
 
+        groupePath.append("defs")
+            .append("svg:clipPath")
+            .attr("id", "mask")
+            .append("svg:rect")
+            .attr("x", 0)
+            .attr("y", 0)
+            .attr("height", height)
+            .attr("width", width)
 
-        groupePath.append("path")
+
+        let masked = groupePath
+            .append("g")
+            .attr("clip-path", "url(#mask)")
+            .append("g")
+            .attr("class", "line");
+
+
+        masked.append("path")
             .datum(tabPrixBTC)
             .attr("fill", "none")
             .attr("stroke", "steelblue")
@@ -144,10 +126,7 @@ d3.csv('/btc.csv')
                 .y(function (d) { return echellePrix(d.prix_btc) })
             )
 
-
-
         //cercles sur la courbe
-
         let Tooltip = divTest.append("div")
             .style("opacity", 0)
             .attr("class", "tooltip")
@@ -210,7 +189,7 @@ d3.csv('/btc.csv')
         console.log(datasTweetFinal)
 
 
-        groupePath.append("g")
+        masked.append("g")
             .selectAll("dot")
             .data(datasTweetFinal)
             .enter()
@@ -230,6 +209,39 @@ d3.csv('/btc.csv')
             .on("mousemove", mousemove)
             .on("mouseleave", mouseleave)
 
+
+        // Zoom
+        const handleZoom = (e) => {
+            // Régénerer un axe à chaque fois qu'on zoom
+            let newX = e.transform.rescaleX(echelleDate);
+            let newY = e.transform.rescaleY(echellePrix);
+
+            // Appeler le nouveau zoom
+            x.call(axeXDate.scale(newX));
+            y.call(axeYPrix.scale(newY));
+
+            // Zoom de la ligne + cercles
+            masked.attr('transform', e.transform);
+        }
+
+
+        const resetZoom = () => {
+            monSVG.transition().duration(750).call(zoom.transform, d3.zoomIdentity.scale(1))
+        }
+
+
+        // Zoom
+        const zoom = d3.zoom()
+            .scaleExtent([1, 20])
+            .extent([[0, 0], [width, height]])
+            .on("zoom", handleZoom);
+
+
+        // append zoom area and apply zoom functions
+        monSVG.call(zoom)
+            .on("dblclick.zoom",resetZoom)
+
+
     })
     .catch(function (err) {
 
@@ -247,21 +259,4 @@ function matcherDatesTabPrixBtcEtTabTweet(dataTweet, tabPrixBTC) {
 
 }
 
-
 //faire zoom pour voir + détaillé (date + proche) et faire scroll pour avancer puis faire apparaître tweet
-
-//ou faire pan + zoom sur la zone sélectionnée
-
-/* function rescaleX(x) {
-    var range = x.range().map(transform.invertX, transform),
-        domain = range.map(x.invert, x);
-    return x.copy().domain(domain);
-  }
-
-  function rescaleY(y) {
-    var range = y.range().map(transform.invertY, transform),
-        domain = range.map(y.invert, y);
-    return y.copy().domain(domain);
-  }
-
-  d3.ZoomTransform(k, x, y) */
