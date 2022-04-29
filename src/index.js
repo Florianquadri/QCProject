@@ -1,6 +1,28 @@
 import * as d3 from 'd3';
 import { retourneTabTweet } from './dataTweet.js'
 //https://www.youtube.com/watch?v=T1X6qQt9ONg pour le crash
+// div sur graphique et non en bas / animation / flèche détectant direction dans graphique / charte devant graphe
+
+//api twitter pour embedded tweet
+window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+      t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+  
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+  
+    return t;
+  }(document, "script", "twitter-wjs"));
+
+  //start
+
 
 
 d3.csv('/btc.csv')
@@ -119,7 +141,7 @@ d3.csv('/btc.csv')
             .datum(tabPrixBTC)
             .attr("fill", "none")
             .attr("stroke", "steelblue")
-            .attr("stroke-width", 1.5)
+            .attr("stroke-width", 1)
             .attr("d", d3.line()
                 //j'aimerais prendre les datas de tabPrixBTC
                 .x(function (d) { return echelleDate(d3.timeParse("%Y-%m-%d")(d.date)) })
@@ -146,19 +168,61 @@ d3.csv('/btc.csv')
             let tweetEmb = d3.select(this).attr("linkTweetEmb");
             console.log(prix)
 
+ /*            let tweet = divTest.append("blockquote")
+            .attr("class" = "twitter-tweet")
+            .append("p")
+            .attr("lang"="en")
+            .attr("dir" = "ltr")
+            .text()
+ */
+
+/*             twttr.widgets.load()
+            twttr.widgets.load(
+                document.getElementById("container")
+              ); */
+
+            /*             Tooltip.attr("transform", "translate(" + d3.select(this).attr("cx") + "," + d3.select(this).attr("cy")); */
+
             Tooltip.html(d)
                 .style("left", d3.select(this).attr("cx") + "px")
                 .style("top", d3.select(this).attr("cy") + "px")
                 .style("opacity", 1)
                 .html("Prix bitcoin: " + prix + "<br>" + srcTweet + "<br>" + dateTweet + "<br>" + tweetEmb)
 
+                let mouseX = d3.select(this).attr("cx");
+                let mouseY = d3.select(this).attr("cy");
+
             monSVG.append('g').attr("id", "img")
                 .append("svg:image")
                 .attr("xlink:href", srcTweet)
-                .attr("width", 300)
-                .attr("height", 300)
-                .attr("x", d3.select(this).attr("cx") - 300)
-                .attr("y", d3.select(this).attr("cy") - 150);
+                .attr("width", width/3)
+                .attr("height", width/3)
+                .attr("x", whereIsMouseX(mouseX))
+                .attr("y", whereIsMouseY(mouseY))
+                .on('click', clickit, true);
+
+                function clickit(){
+                    window.open(tweetEmb);
+                  }      
+
+
+            function whereIsMouseX(x) {
+                console.log("x",x);
+                console.log("width", width)
+                let x2;
+                if (x > (width / 2)) { x2 = parseInt(x - width / 3) }
+                else if (x < (width / 2)) { x2 = parseInt(x + width / 2) }
+                return x2;
+            }
+
+            function whereIsMouseY(y) {
+                console.log("y", y)
+                console.log("height", height)
+                let y2;
+                if (y > (height / 2)) { y2 = parseInt(y - height / 2) }
+                else if (y < (height / 2)) { y2 = parseInt(y + height / 2) }
+                return y2;
+            }
         }
 
         let mousemove = function (d, i) {
@@ -178,7 +242,9 @@ d3.csv('/btc.csv')
             Tooltip
                 .style("opacity", 0)
 
-            d3.select("#img").remove();
+            d3.selectAll("#img").transition().duration(1000).remove();
+
+
         }
 
         //test avec tableau de tweet --> il faudra que ce soit dans doc CSV à appeler
@@ -201,20 +267,20 @@ d3.csv('/btc.csv')
             .attr("linkTweet", function (d) { return d.src })
             .attr("linkTweetEmb", function (d) { return d.linkTweet })
             .attr("date", function (d) { return d.date })
-            .attr("r", 8)
-            .attr("stroke", "#69b3a2")
-            .attr("stroke-width", 3)
+            .attr("r", 4)
+            .attr("stroke", "black")
+            .attr("stroke-width", 2)
             .attr("fill", "white")
             .on("mouseover", mouseover)
             .on("mousemove", mousemove)
             .on("mouseleave", mouseleave)
-
 
         // Zoom
         const handleZoom = (e) => {
             // Régénerer un axe à chaque fois qu'on zoom
             let newX = e.transform.rescaleX(echelleDate);
             let newY = e.transform.rescaleY(echellePrix);
+
 
             // Appeler le nouveau zoom
             x.call(axeXDate.scale(newX));
@@ -232,19 +298,37 @@ d3.csv('/btc.csv')
             .extent([[0, 0], [width, height]])
             .on("zoom", handleZoom);
 
-            const resetZoom = () => {
-                monSVG.transition().duration(750).call(zoom.transform, d3.zoomIdentity.scale(1))
-            }
 
-            const dbclick = () => {
-                monSVG.transition().duration(750).call(zoom.transform, d3.zoomIdentity.scale(8));
-            }
+        /*        const resetZoom = () => {
+                   if (key == "q") { monSVG.transition().duration(750).call(zoom.transform, d3.zoomIdentity.scale(1)) }
+       
+               } */
+
+        const dbclick = () => {
+            monSVG.transition().duration(750).call(zoom.transform, d3.zoomIdentity.scale(8));
+        }
 
 
         // append zoom area and apply zoom functions
         monSVG.call(zoom)
-            .on("click.zoom",resetZoom)
-            .on("dbclick.zoom",dbclick)
+            /* .on("keypress",resetZoom) */
+            .on("dbclick.zoom", dbclick)
+
+        d3.select('body').on("keydown", function (e) {
+            console.log("keydown");
+            console.log(e)
+            //return "line_chart.html";
+
+            if (e.key === "q") { // left     
+                monSVG.transition().duration(750).call(zoom.transform, d3.zoomIdentity.scale(1));
+            }
+            else if (e.key === "ArrowRight") { // left     
+                //translateTo
+                console.log("droite");
+                monSVG.transition().duration(750).call(zoom.transform, d3.zoomIdentity.translate(50, 30));
+               
+            }
+        });
 
 
     })
