@@ -4,24 +4,24 @@ import { retourneTabTweet } from './dataTweet.js'
 // div sur graphique et non en bas / animation / flèche détectant direction dans graphique / charte devant graphe
 
 //api twitter pour embedded tweet
-window.twttr = (function(d, s, id) {
+window.twttr = (function (d, s, id) {
     var js, fjs = d.getElementsByTagName(s)[0],
-      t = window.twttr || {};
+        t = window.twttr || {};
     if (d.getElementById(id)) return t;
     js = d.createElement(s);
     js.id = id;
     js.src = "https://platform.twitter.com/widgets.js";
     fjs.parentNode.insertBefore(js, fjs);
-  
-    t._e = [];
-    t.ready = function(f) {
-      t._e.push(f);
-    };
-  
-    return t;
-  }(document, "script", "twitter-wjs"));
 
-  //start
+    t._e = [];
+    t.ready = function (f) {
+        t._e.push(f);
+    };
+
+    return t;
+}(document, "script", "twitter-wjs"));
+
+//start
 
 
 
@@ -150,6 +150,7 @@ d3.csv('/btc.csv')
 
         //cercles sur la courbe
         let Tooltip = divTest.append("div")
+            .style("position", "fixed")
             .style("opacity", 0)
             .attr("class", "tooltip")
             .attr("width", "50px")
@@ -168,18 +169,18 @@ d3.csv('/btc.csv')
             let tweetEmb = d3.select(this).attr("linkTweetEmb");
             console.log(prix)
 
- /*            let tweet = divTest.append("blockquote")
-            .attr("class" = "twitter-tweet")
-            .append("p")
-            .attr("lang"="en")
-            .attr("dir" = "ltr")
-            .text()
- */
+            /*            let tweet = divTest.append("blockquote")
+                       .attr("class" = "twitter-tweet")
+                       .append("p")
+                       .attr("lang"="en")
+                       .attr("dir" = "ltr")
+                       .text()
+            */
 
-/*             twttr.widgets.load()
-            twttr.widgets.load(
-                document.getElementById("container")
-              ); */
+            /*             twttr.widgets.load()
+                        twttr.widgets.load(
+                            document.getElementById("container")
+                          ); */
 
             /*             Tooltip.attr("transform", "translate(" + d3.select(this).attr("cx") + "," + d3.select(this).attr("cy")); */
 
@@ -189,25 +190,25 @@ d3.csv('/btc.csv')
                 .style("opacity", 1)
                 .html("Prix bitcoin: " + prix + "<br>" + srcTweet + "<br>" + dateTweet + "<br>" + tweetEmb)
 
-                let mouseX = d3.select(this).attr("cx");
-                let mouseY = d3.select(this).attr("cy");
+            let mouseX = d3.select(this).attr("cx");
+            let mouseY = d3.select(this).attr("cy");
 
             monSVG.append('g').attr("id", "img")
                 .append("svg:image")
                 .attr("xlink:href", srcTweet)
-                .attr("width", width/3)
-                .attr("height", width/3)
+                .attr("width", width / 3)
+                .attr("height", width / 3)
                 .attr("x", whereIsMouseX(mouseX))
                 .attr("y", whereIsMouseY(mouseY))
                 .on('click', clickit, true);
 
-                function clickit(){
-                    window.open(tweetEmb);
-                  }      
+            function clickit() {
+                window.open(tweetEmb);
+            }
 
 
             function whereIsMouseX(x) {
-                console.log("x",x);
+                console.log("x", x);
                 console.log("width", width)
                 let x2;
                 if (x > (width / 2)) { x2 = parseInt(x - width / 3) }
@@ -326,7 +327,7 @@ d3.csv('/btc.csv')
                 //translateTo
                 console.log("droite");
                 monSVG.transition().duration(750).call(zoom.transform, d3.zoomIdentity.translate(50, 30));
-               
+
             }
         });
 
