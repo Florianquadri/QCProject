@@ -31,7 +31,11 @@ d3.csv('/btc.csv')
 
         // Manipulation de données
         const tabPrixBTC = data.map((d, i) => {
-            let prixArrondi = Math.round(d.PriceUSD);
+
+            let prixArrondi = Math.round((d.PriceUSD) * 100) / 100;
+            if (d.PriceUSD > 100) {
+                prixArrondi = Math.round(d.PriceUSD);
+            }
             //je reformate les variables dates
             //            let infosSelect = { date: d3.timeParse("%Y-%m-%d")(d.time), prix_btc: prixArrondi, marketCap: d.CapMrktCurUSD }
             let infosSelect = { date: d.time, prix_btc: prixArrondi, marketCap: d.CapMrktCurUSD }
@@ -52,8 +56,46 @@ d3.csv('/btc.csv')
             width = window.innerWidth - margin.left - margin.right,
             height = window.innerHeight - margin.top - margin.bottom;
 
+        document.getElementById('button_start').style.color = 'gold';
+
+        const button = d3.select("#button_start");
+        button
+            .style("position", "fixed")
+            .style("zIndex", "1")
+            .style("opacity", 1)
+            .style("background-color", "black")
+            .style("border", "solid")
+            .style("border-width", "2px")
+            .style("border-radius", "5px")
+            .style("border-color", "gold")
+            .style("padding", "5px")
+            .attr("class", "button")
+            .attr("top", "0px")
+            .attr("left", "0px")
+            .on("mouseover", function (d) {
+                d3.select(this).style("background-color", "gold");
+                d3.select(this).style("border-color", "black");
+                document.getElementById('button_start').style.color = 'black';
+            })
+            .on("mouseleave", function (d) {
+                d3.select(this).style("background-color", "black");
+                d3.select(this).style("border-color", "gold");
+                document.getElementById('button_start').style.color = 'gold';
+            })
+            .on("click", (d) => {
+                console.log("letsgo")
+            })
 
         const divTest = d3.select("#testDonnees");
+        const monBody = d3.select("body")
+        const divBouton = monBody.append("div")
+            .style("position", "fixed")
+            .attr("top", "0px")
+            .attr("left", "50px")
+            .attr("width", "500px")
+            .attr("height", "30px");
+
+
         let monSVG = divTest.append('svg');
 
         monSVG.attr("width", width + margin.left + margin.right)
@@ -96,8 +138,8 @@ d3.csv('/btc.csv')
             .call(axeXDate)
 
         const y = groupeAAppend.append('g')
-              .attr("class", "axeY")
-              .style("stroke", "gold")
+            .attr("class", "axeY")
+            .style("stroke", "gold")
             .call(axeYPrix);
 
         // let brush = d3.brush()
@@ -188,11 +230,15 @@ d3.csv('/btc.csv')
 
             /*             Tooltip.attr("transform", "translate(" + d3.select(this).attr("cx") + "," + d3.select(this).attr("cy")); */
 
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            let dateJolie = new Date(dateTweet);
+            let dateJolie2 = dateJolie.toLocaleDateString("fr", options);
+
             Tooltip.html(d)
                 .style("left", event.pageX - 50 + "px")
-                .style("top", event.pageY - 50 + "px")
+                .style("top", event.pageY - 80 + "px")
                 .style("opacity", 1)
-                .html("Prix BTC: " + prix + "<br>" + "Date : " + dateTweet /* + "<br>" + srcTweet + "<br>" + dateTweet + "<br>" + tweetEmb */)
+                .html(dateJolie2 +"<br>"+ "₿itcoin : " + prix + " Chf" /* + "<br>" + srcTweet + "<br>" + dateTweet + "<br>" + tweetEmb */)
             /* 
                         let mouseX = event.pageX;
                         let mouseY = event.pageY; */
@@ -232,7 +278,7 @@ d3.csv('/btc.csv')
             }
         }
 
-        let mousemove = function (d, i) {
+        let mousemove = function (event, d, i) {
             let dateTweet = d3.select(this).attr("date");
             let prix = d3.select(this).attr("price")
             let srcTweet = d3.select(this).attr("linkTweet");
@@ -241,16 +287,15 @@ d3.csv('/btc.csv')
 
             Tooltip.html(d)
                 .style("left", event.pageX - 50 + "px")
-                .style("top", event.pageY - 50 + "px")
+                .style("top", event.pageY - 80 + "px")
                 .style("opacity", 1)
                 .html("Prix BTC: " + prix + "<br>" + "Date : " + dateTweet /* + "<br>" + srcTweet + "<br>" + dateTweet + "<br>" + tweetEmb */)
         }
 
         let mouseleave = function (d, i) {
             Tooltip
-                .style("opacity", 0)
-                .style("color", "black");
-            /* .transition().duration(1500).style("opacity", 0); */
+                /*                 .style("opacity", 0) */
+                .transition().duration(800).style("opacity", 0);
 
 
 
