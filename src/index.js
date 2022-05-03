@@ -2,7 +2,7 @@ import * as d3 from 'd3';
 import { retourneTabTweet } from './dataTweet.js'
 //https://www.youtube.com/watch?v=T1X6qQt9ONg pour le crash
 // div sur graphique et non en bas / animation / flèche détectant direction dans graphique / charte devant graphe
-
+d3.select('body').style("background-color", "black")
 //api twitter pour embedded tweet
 window.twttr = (function (d, s, id) {
     var js, fjs = d.getElementsByTagName(s)[0],
@@ -90,10 +90,14 @@ d3.csv('/btc.csv')
         const groupeAAppend = monSVG.select('.gAAppend');
 
         const x = groupeAAppend.append('g')
+            .attr("class", "axeX")
+            .style("stroke", "gold")
             .attr("transform", "translate(0," + height + ")")
             .call(axeXDate)
 
         const y = groupeAAppend.append('g')
+              .attr("class", "axeY")
+              .style("stroke", "gold")
             .call(axeYPrix);
 
         // let brush = d3.brush()
@@ -140,7 +144,7 @@ d3.csv('/btc.csv')
         masked.append("path")
             .datum(tabPrixBTC)
             .attr("fill", "none")
-            .attr("stroke", "steelblue")
+            .attr("stroke", "gold")
             .attr("stroke-width", 1)
             .attr("d", d3.line()
                 //j'aimerais prendre les datas de tabPrixBTC
@@ -150,7 +154,7 @@ d3.csv('/btc.csv')
 
         //cercles sur la courbe
         let Tooltip = divTest.append("div")
-            .style("position", "fixed")
+            .style("position", "absolute")
             .style("opacity", 0)
             .attr("class", "tooltip")
             .attr("width", "50px")
@@ -161,7 +165,7 @@ d3.csv('/btc.csv')
             .style("border-radius", "5px")
             .style("padding", "5px")
 
-        let mouseover = function (d, i) {
+        let mouseover = function (event, d, i) {
 
             let prix = d3.select(this).attr("price")
             let srcTweet = d3.select(this).attr("linkTweet");
@@ -185,11 +189,13 @@ d3.csv('/btc.csv')
             /*             Tooltip.attr("transform", "translate(" + d3.select(this).attr("cx") + "," + d3.select(this).attr("cy")); */
 
             Tooltip.html(d)
-                .style("left", d3.select(this).attr("cx") + "px")
-                .style("top", d3.select(this).attr("cy") + "px")
+                .style("left", event.pageX - 50 + "px")
+                .style("top", event.pageY - 50 + "px")
                 .style("opacity", 1)
-                .html("Prix bitcoin: " + prix + "<br>" + srcTweet + "<br>" + dateTweet + "<br>" + tweetEmb)
-
+                .html("Prix BTC: " + prix + "<br>" + "Date : " + dateTweet /* + "<br>" + srcTweet + "<br>" + dateTweet + "<br>" + tweetEmb */)
+            /* 
+                        let mouseX = event.pageX;
+                        let mouseY = event.pageY; */
             let mouseX = d3.select(this).attr("cx");
             let mouseY = d3.select(this).attr("cy");
 
@@ -233,17 +239,22 @@ d3.csv('/btc.csv')
             let tweetEmb = d3.select(this).attr("linkTweetEmb");
 
 
-            Tooltip
-                .html("Prix bitcoin: " + prix + "<br>" + srcTweet + "<br>" + dateTweet + "<br>" + tweetEmb)
-                .style("left", (d3.pointer(this)[0] + 70) + "px")
-                .style("top", (d3.pointer(this)[1]) + "px")
+            Tooltip.html(d)
+                .style("left", event.pageX - 50 + "px")
+                .style("top", event.pageY - 50 + "px")
+                .style("opacity", 1)
+                .html("Prix BTC: " + prix + "<br>" + "Date : " + dateTweet /* + "<br>" + srcTweet + "<br>" + dateTweet + "<br>" + tweetEmb */)
         }
 
         let mouseleave = function (d, i) {
             Tooltip
                 .style("opacity", 0)
+                .style("color", "black");
+            /* .transition().duration(1500).style("opacity", 0); */
 
-            d3.selectAll("#img").transition().duration(1000).remove();
+
+
+            d3.selectAll("#img").transition().duration(500).remove();
 
 
         }
@@ -273,7 +284,7 @@ d3.csv('/btc.csv')
             .attr("stroke-width", 2)
             .attr("fill", "white")
             .on("mouseover", mouseover)
-            .on("mousemove", mousemove)
+            /*             .on("mousemove", mousemove) */
             .on("mouseleave", mouseleave)
 
         // Zoom
