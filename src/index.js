@@ -59,6 +59,8 @@ d3.csv('/btc.csv')
         document.getElementById('button_start').style.color = 'gold';
 
         const button = d3.select("#button_start");
+        let scrollOuPas = false;
+
         button
             .style("position", "fixed")
             .style("zIndex", "1")
@@ -82,9 +84,32 @@ d3.csv('/btc.csv')
                 d3.select(this).style("border-color", "gold");
                 document.getElementById('button_start').style.color = 'gold';
             })
-            .on("click", (d) => {
-                console.log("letsgo")
+            .on("click", (d, event) => {
+                console.log("letsgo");
+                const xyStart = document.getElementById('0');
+                let xStart = parseFloat(xyStart.getAttribute("cx"));
+                let yStart = parseFloat(xyStart.getAttribute("cy"));
+                console.log("X:", xStart, "Y:", yStart)
+                //je positionne le zoom sur le premier cercle (id == 0)
+
+                //je zoom à la valeur de zoom souhaitée
+                monSVG
+                    .transition()
+                    .duration(500)
+                    .call(zoom.translateTo, xStart, yStart)
+                    .transition()
+                    .duration(500)
+                    .call(zoom.scaleTo, 5)
+
+                //uniquement après le click, on doit pouvoir détecter le scroll et déclencher un événement
+                scrollOuPas = true;
             })
+
+        if (scrollOuPas) {
+            d3.select('body').on('scroll', function () {
+                /* avancer au prochain point */
+            })
+        }
 
         const divTest = d3.select("#testDonnees");
         const monBody = d3.select("body")
@@ -238,7 +263,7 @@ d3.csv('/btc.csv')
                 .style("left", event.pageX - 50 + "px")
                 .style("top", event.pageY - 80 + "px")
                 .style("opacity", 1)
-                .html(dateJolie2 +"<br>"+ "₿itcoin : " + prix + " Chf" /* + "<br>" + srcTweet + "<br>" + dateTweet + "<br>" + tweetEmb */)
+                .html(dateJolie2 + "<br>" + "₿itcoin : " + prix + " Chf" /* + "<br>" + srcTweet + "<br>" + dateTweet + "<br>" + tweetEmb */)
             /* 
                         let mouseX = event.pageX;
                         let mouseY = event.pageY; */
@@ -318,6 +343,8 @@ d3.csv('/btc.csv')
             .enter()
             .append("circle")
             .attr("class", "myCircle")
+            //id permettant au zoom de se déplacer au scroll d'un point à un autre
+            .attr("id", function (d, i) { return i })
             .attr("cx", function (d) { return echelleDate(d3.timeParse("%Y-%m-%d")(d.date)) })
             .attr("cy", function (d) { return echellePrix(d.prix_btc) })
             .attr("price", function (d) { return d.prix_btc })
@@ -338,7 +365,6 @@ d3.csv('/btc.csv')
             let newX = e.transform.rescaleX(echelleDate);
             let newY = e.transform.rescaleY(echellePrix);
 
-
             // Appeler le nouveau zoom
             x.call(axeXDate.scale(newX));
             y.call(axeYPrix.scale(newY));
@@ -347,10 +373,8 @@ d3.csv('/btc.csv')
             masked.attr('transform', e.transform);
         }
 
-
-
         // Zoom
-        const zoom = d3.zoom()
+        let zoom = d3.zoom()
             .scaleExtent([1, 10])
             .extent([[0, 0], [width, height]])
             .on("zoom", handleZoom);
@@ -382,7 +406,7 @@ d3.csv('/btc.csv')
             else if (e.key === "ArrowRight") { // left     
                 //translateTo
                 console.log("droite");
-                monSVG.transition().duration(750).call(zoom.transform, d3.zoomIdentity.translate(50, 30));
+                monSVG.transition().duration(750).call(zoom.transform, d3.zoomIdentity.translate(100, 200));
 
             }
         });
