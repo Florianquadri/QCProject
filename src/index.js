@@ -36,7 +36,11 @@ d3.csv('/btc.csv')
             }
             //je reformate les variables dates
             //            let infosSelect = { date: d3.timeParse("%Y-%m-%d")(d.time), prix_btc: prixArrondi, marketCap: d.CapMrktCurUSD }
-            let infosSelect = { date: d.time, prix_btc: prixArrondi, marketCap: d.CapMrktCurUSD }
+            let infosSelect = { date: d.time,
+                prix_btc: prixArrondi,
+                marketCap:
+                d.CapMrktCurUSD
+            }
             return infosSelect;
         })
 
@@ -49,12 +53,17 @@ d3.csv('/btc.csv')
 
         //1 : créer marges et taille SVG
         const margin = {
-            top: 50, right: 50, bottom: 50, left: 50
+            top: 50,
+            right: 50,
+            bottom: 50,
+            left: 50
         },
             width = window.innerWidth - margin.left - margin.right,
             height = window.innerHeight - margin.top - margin.bottom;
 
         document.getElementById('button_start').style.color = 'gold';
+
+        //bouton start à cliquer
 
         const button = d3.select("#button_start");
 
@@ -118,9 +127,6 @@ d3.csv('/btc.csv')
                     .call(zoom.translateTo, xStart, yStart)
             }
 
-            //enlever le hover sur le cercle avec l'id d'avant
-            //effectuer un hover automatiquement sur le cercle en question
-
         }
 
         d3.select('body').on('scroll', function () {
@@ -132,6 +138,7 @@ d3.csv('/btc.csv')
 
             else {
                 monSVG.transition().duration(750).call(zoom.transform, d3.zoomIdentity.scale(1));
+                idChoisi=-1;
             }
 
         })
@@ -448,6 +455,7 @@ d3.csv('/btc.csv')
                 else {
                     monSVG.transition().duration(750).call(zoom.transform, d3.zoomIdentity.scale(1));
                     d3.selectAll("#img").transition().duration(200).remove();
+                    idChoisi=-1;
                 }
 
                 /*   monSVG.transition().duration(750).call(zoom.transform, d3.zoomIdentity.translate(100, 200)); */
@@ -462,6 +470,10 @@ d3.csv('/btc.csv')
                     zoomToPoint(idChoisi);
                     d3.selectAll("#img").transition().duration(200).remove();
                     setTimeout(ajouteImg,500)
+                } else {
+                    monSVG.transition().duration(750).call(zoom.transform, d3.zoomIdentity.scale(1));
+                    d3.selectAll("#img").transition().duration(200).remove();
+                    idChoisi=-1;
                 }
 
                 /*   monSVG.transition().duration(750).call(zoom.transform, d3.zoomIdentity.translate(100, 200)); */
