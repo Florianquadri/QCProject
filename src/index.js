@@ -125,17 +125,15 @@ d3.csv('/btc.csv')
 
         d3.select('body').on('scroll', function () {
             //if id choisi est le last, on revient au début
-            /*                             if(idChoisi<dernierId){
-                             idChoisi--;
-                             zoomToPoint(idChoisi);
-                         } */
-            //cas standard
+            if (idChoisi < datasTweetFinal.length - 1) {
+                idChoisi++;
+                zoomToPoint(idChoisi);
+            }
 
-            idChoisi++;
-            zoomToPoint(idChoisi);
+            else {
+                monSVG.transition().duration(750).call(zoom.transform, d3.zoomIdentity.scale(1));
+            }
 
-
-            /* avancer au prochain point */
         })
 
         const divTest = d3.select("#testDonnees");
@@ -306,7 +304,7 @@ d3.csv('/btc.csv')
                 .attr("y", whereIsMouseY(mouseY))
                 .on('click', clickit, true);
 
-            function clickit() {
+            function clickit(link = tweetEmb) {
                 window.open(tweetEmb);
             }
 
@@ -365,6 +363,7 @@ d3.csv('/btc.csv')
 
 
         masked.append("g")
+            .attr("id", "contientCercle")
             .selectAll("dot")
             .data(datasTweetFinal)
             .enter()
@@ -427,14 +426,29 @@ d3.csv('/btc.csv')
             console.log(e)
             //return "line_chart.html";
 
-            if (e.key === "q") { // left     
+            if (e.key === "q") { // left  
+                idChoisi = -1;   
                 monSVG.transition().duration(750).call(zoom.transform, d3.zoomIdentity.scale(1));
+                d3.selectAll("#img").transition().duration(200).remove();
             }
             else if (e.key === "ArrowRight") { // left     
                 //translateTo
                 console.log("droite");
-                idChoisi++;
-                zoomToPoint(idChoisi);
+
+                if (idChoisi < datasTweetFinal.length - 1) {
+                    idChoisi++;
+                    zoomToPoint(idChoisi);
+                    /*      mouseover(1); */
+
+                    d3.selectAll("#img").transition().duration(200).remove();
+                    setTimeout(ajouteImg,500)
+    
+
+                }
+                else {
+                    monSVG.transition().duration(750).call(zoom.transform, d3.zoomIdentity.scale(1));
+                    d3.selectAll("#img").transition().duration(200).remove();
+                }
 
                 /*   monSVG.transition().duration(750).call(zoom.transform, d3.zoomIdentity.translate(100, 200)); */
 
@@ -442,10 +456,12 @@ d3.csv('/btc.csv')
 
             else if (e.key === "ArrowLeft") { // left     
                 //translateTo
-                console.log("droite");
+                console.log("gauche");
                 if (idChoisi > 0) {
                     idChoisi--;
                     zoomToPoint(idChoisi);
+                    d3.selectAll("#img").transition().duration(200).remove();
+                    setTimeout(ajouteImg,500)
                 }
 
                 /*   monSVG.transition().duration(750).call(zoom.transform, d3.zoomIdentity.translate(100, 200)); */
@@ -454,6 +470,26 @@ d3.csv('/btc.csv')
 
 
         });
+
+        function ajouteImg(id = idChoisi) {
+            monSVG.append('g').attr("id", "img")
+            .append("svg:image")
+            .attr("xlink:href", function (d) {
+                return datasTweetFinal[idChoisi].src;
+            })
+            .attr("width", width / 3)
+            .attr("height", width / 3)
+            .attr("x", width / 3)
+            .attr("y", height / 10)
+            .on("click", function (d) {
+                ouvreTweet(datasTweetFinal[idChoisi].linkTweet)
+            });
+            console.log(datasTweetFinal[idChoisi].linkTweet)
+        }
+
+        function ouvreTweet(pageTweet) {
+            window.open(pageTweet);
+        }
 
 
     })
