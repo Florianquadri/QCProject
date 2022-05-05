@@ -23,8 +23,6 @@ window.twttr = (function (d, s, id) {
 
 //start
 
-
-
 d3.csv('/btc.csv')
 
     .then(function (data) {
@@ -59,7 +57,6 @@ d3.csv('/btc.csv')
         document.getElementById('button_start').style.color = 'gold';
 
         const button = d3.select("#button_start");
-        let scrollOuPas = false;
 
         button
             .style("position", "fixed")
@@ -86,13 +83,25 @@ d3.csv('/btc.csv')
             })
             .on("click", (d, event) => {
                 console.log("letsgo");
-                const xyStart = document.getElementById('0');
-                let xStart = parseFloat(xyStart.getAttribute("cx"));
-                let yStart = parseFloat(xyStart.getAttribute("cy"));
-                console.log("X:", xStart, "Y:", yStart)
-                //je positionne le zoom sur le premier cercle (id == 0)
+                zoomToPoint(0);
 
-                //je zoom à la valeur de zoom souhaitée
+            })
+
+        let idChoisi = -1;
+
+        function zoomToPoint(id) {
+
+            const xyStart = document.getElementById(id);
+
+            //je positionne le zoom sur le premier cercle (id == 0)
+
+            let xStart = parseFloat(xyStart.getAttribute("cx"));
+            let yStart = parseFloat(xyStart.getAttribute("cy"));
+            console.log("X:", xStart, "Y:", yStart)
+
+            //je zoom à la valeur de zoom souhaitée
+
+            if (id == 0) {
                 monSVG
                     .transition()
                     .duration(500)
@@ -100,16 +109,34 @@ d3.csv('/btc.csv')
                     .transition()
                     .duration(500)
                     .call(zoom.scaleTo, 5)
+            }
 
-                //uniquement après le click, on doit pouvoir détecter le scroll et déclencher un événement
-                scrollOuPas = true;
-            })
+            else {
+                monSVG
+                    .transition()
+                    .duration(500)
+                    .call(zoom.translateTo, xStart, yStart)
+            }
 
-        if (scrollOuPas) {
-            d3.select('body').on('scroll', function () {
-                /* avancer au prochain point */
-            })
+            //enlever le hover sur le cercle avec l'id d'avant
+            //effectuer un hover automatiquement sur le cercle en question
+
         }
+
+        d3.select('body').on('scroll', function () {
+            //if id choisi est le last, on revient au début
+            /*                             if(idChoisi<dernierId){
+                             idChoisi--;
+                             zoomToPoint(idChoisi);
+                         } */
+            //cas standard
+
+            idChoisi++;
+            zoomToPoint(idChoisi);
+
+
+            /* avancer au prochain point */
+        })
 
         const divTest = d3.select("#testDonnees");
         const monBody = d3.select("body")
@@ -406,9 +433,26 @@ d3.csv('/btc.csv')
             else if (e.key === "ArrowRight") { // left     
                 //translateTo
                 console.log("droite");
-                monSVG.transition().duration(750).call(zoom.transform, d3.zoomIdentity.translate(100, 200));
+                idChoisi++;
+                zoomToPoint(idChoisi);
+
+                /*   monSVG.transition().duration(750).call(zoom.transform, d3.zoomIdentity.translate(100, 200)); */
 
             }
+
+            else if (e.key === "ArrowLeft") { // left     
+                //translateTo
+                console.log("droite");
+                if (idChoisi > 0) {
+                    idChoisi--;
+                    zoomToPoint(idChoisi);
+                }
+
+                /*   monSVG.transition().duration(750).call(zoom.transform, d3.zoomIdentity.translate(100, 200)); */
+
+            }
+
+
         });
 
 
