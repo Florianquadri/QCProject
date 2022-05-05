@@ -36,10 +36,11 @@ d3.csv('/btc.csv')
             }
             //je reformate les variables dates
             //            let infosSelect = { date: d3.timeParse("%Y-%m-%d")(d.time), prix_btc: prixArrondi, marketCap: d.CapMrktCurUSD }
-            let infosSelect = { date: d.time,
+            let infosSelect = {
+                date: d.time,
                 prix_btc: prixArrondi,
                 marketCap:
-                d.CapMrktCurUSD
+                    d.CapMrktCurUSD
             }
             return infosSelect;
         })
@@ -67,6 +68,8 @@ d3.csv('/btc.csv')
 
         const button = d3.select("#button_start");
 
+        let idChoisi = -1;
+
         button
             .style("position", "fixed")
             .style("zIndex", "1")
@@ -92,11 +95,15 @@ d3.csv('/btc.csv')
             })
             .on("click", (d, event) => {
                 console.log("letsgo");
-                zoomToPoint(0);
+
+                idChoisi++;
+                zoomToPoint(idChoisi);
+                /*      mouseover(1); */
+
+                d3.selectAll("#img").transition().duration(200).remove();
+                setTimeout(ajouteImg, 500)
 
             })
-
-        let idChoisi = -1;
 
         function zoomToPoint(id) {
 
@@ -111,6 +118,7 @@ d3.csv('/btc.csv')
             //je zoom à la valeur de zoom souhaitée
 
             if (id == 0) {
+                console.log("test", id)
                 monSVG
                     .transition()
                     .duration(500)
@@ -118,8 +126,8 @@ d3.csv('/btc.csv')
                     .transition()
                     .duration(500)
                     .call(zoom.scaleTo, 5)
-            }
 
+            }
             else {
                 monSVG
                     .transition()
@@ -138,7 +146,7 @@ d3.csv('/btc.csv')
 
             else {
                 monSVG.transition().duration(750).call(zoom.transform, d3.zoomIdentity.scale(1));
-                idChoisi=-1;
+                idChoisi = -1;
             }
 
         })
@@ -434,7 +442,7 @@ d3.csv('/btc.csv')
             //return "line_chart.html";
 
             if (e.key === "q") { // left  
-                idChoisi = -1;   
+                idChoisi = -1;
                 monSVG.transition().duration(750).call(zoom.transform, d3.zoomIdentity.scale(1));
                 d3.selectAll("#img").transition().duration(200).remove();
             }
@@ -448,14 +456,14 @@ d3.csv('/btc.csv')
                     /*      mouseover(1); */
 
                     d3.selectAll("#img").transition().duration(200).remove();
-                    setTimeout(ajouteImg,500)
-    
+                    setTimeout(ajouteImg, 500)
+
 
                 }
                 else {
                     monSVG.transition().duration(750).call(zoom.transform, d3.zoomIdentity.scale(1));
                     d3.selectAll("#img").transition().duration(200).remove();
-                    idChoisi=-1;
+                    idChoisi = -1;
                 }
 
                 /*   monSVG.transition().duration(750).call(zoom.transform, d3.zoomIdentity.translate(100, 200)); */
@@ -469,11 +477,11 @@ d3.csv('/btc.csv')
                     idChoisi--;
                     zoomToPoint(idChoisi);
                     d3.selectAll("#img").transition().duration(200).remove();
-                    setTimeout(ajouteImg,500)
+                    setTimeout(ajouteImg, 500)
                 } else {
                     monSVG.transition().duration(750).call(zoom.transform, d3.zoomIdentity.scale(1));
                     d3.selectAll("#img").transition().duration(200).remove();
-                    idChoisi=-1;
+                    idChoisi = -1;
                 }
 
                 /*   monSVG.transition().duration(750).call(zoom.transform, d3.zoomIdentity.translate(100, 200)); */
@@ -485,17 +493,17 @@ d3.csv('/btc.csv')
 
         function ajouteImg(id = idChoisi) {
             monSVG.append('g').attr("id", "img")
-            .append("svg:image")
-            .attr("xlink:href", function (d) {
-                return datasTweetFinal[idChoisi].src;
-            })
-            .attr("width", width / 3)
-            .attr("height", width / 3)
-            .attr("x", width / 3)
-            .attr("y", height / 10)
-            .on("click", function (d) {
-                ouvreTweet(datasTweetFinal[idChoisi].linkTweet)
-            });
+                .append("svg:image")
+                .attr("xlink:href", function (d) {
+                    return datasTweetFinal[idChoisi].src;
+                })
+                .attr("width", width / 3)
+                .attr("height", width / 3)
+                .attr("x", width / 3)
+                .attr("y", height / 10)
+                .on("click", function (d) {
+                    ouvreTweet(datasTweetFinal[idChoisi].linkTweet)
+                });
             console.log(datasTweetFinal[idChoisi].linkTweet)
         }
 
