@@ -1,5 +1,7 @@
 import * as d3 from 'd3';
-import { retourneTabTweet } from './dataTweet.js'
+import { retourneTabTweet } from './dataTweet.js';
+import TwitterComponent from 'twitter-component';
+
 //https://www.youtube.com/watch?v=T1X6qQt9ONg pour le crash
 // div sur graphique et non en bas / animation / flèche détectant direction dans graphique / charte devant graphe
 d3.select('body').style("background-color", "black")
@@ -290,7 +292,7 @@ d3.csv('/btc.csv')
 
         let mouseover = function (event, d, i) {
 
-
+            let tweet=new TwitterComponent();
             let idCercle = d3.select(this).attr("id")
             let prix = d3.select(this).attr("price")
             let srcTweet = d3.select(this).attr("linkTweet");
@@ -325,14 +327,18 @@ d3.csv('/btc.csv')
             let mouseX2 = whereIsMouseX(mouseX);
             let mouseY2 = whereIsMouseY(mouseY);
 
-
-            monImgModif.setAttribute("href", srcTweet);
+            const tweetDom = document.getElementById("tweet");
+            tweetDom.replaceChildren(tweet.render(tweetEmb));       
+            tweetDom.style.display="block";
+                tweetDom.style.left=mouseX2+"px";
+                tweetDom.style.top=(mouseY2-50)+"px";
+            /* monImgModif.setAttribute("href", srcTweet);
             monImgModif.setAttribute("x", mouseX2);
             monImgModif.setAttribute("y", mouseY2);
 
 
             sectionImg.transition().duration(10).style("opacity", 1);
-            sectionImg.on('click', clickit, true);
+            sectionImg.on('click', clickit, true); */
 
             function clickit(link = tweetEmb) {
                 window.open(tweetEmb);
@@ -386,8 +392,8 @@ d3.csv('/btc.csv')
             Tooltip
                 .transition().duration(300).style("opacity", 0)
 
-            sectionImg.transition().duration(1000).style("opacity", 0)
-
+           /*  sectionImg.transition().duration(1000).style("opacity", 0) */
+           document.querySelector("#tweet").style.display="none";
             hoverNumberY = 0;
             hoverNumberX = 0;
 
@@ -519,8 +525,14 @@ d3.csv('/btc.csv')
         });
 
         function ajouteImg(id = idChoisi) {
-            monSVG.append('g').attr("id", "img")
-                .append("svg:image")
+            let tweet=new TwitterComponent();
+            let tweetEmb =datasTweetFinal[idChoisi].linkTweet;
+            const tweetDom = document.getElementById("tweet");
+           tweetDom.replaceChildren(tweet.render(tweetEmb));
+            tweetDom.style.left=width /2 +"px";
+            tweetDom.style.top=height /10 +"px";
+            /* monSVG.append('g').attr("id", "img")
+                .append("svg:tweet",b)
                 .attr("xlink:href", function (d) {
                     return datasTweetFinal[idChoisi].src;
                 })
@@ -531,7 +543,7 @@ d3.csv('/btc.csv')
                 .on("click", function (d) {
                     ouvreTweet(datasTweetFinal[idChoisi].linkTweet)
                 });
-            console.log(datasTweetFinal[idChoisi].linkTweet)
+            console.log(datasTweetFinal[idChoisi].linkTweet) */
         }
 
         function ouvreTweet(pageTweet) {
