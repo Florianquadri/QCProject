@@ -101,7 +101,7 @@ d3.csv('/btc.csv')
                 /*      mouseover(1); */
 
                 d3.selectAll("#img").transition().duration(200).remove();
-                setTimeout(ajouteImg, 500)
+                setTimeout(ajouteImg, 50000)
 
             })
 
@@ -272,28 +272,31 @@ d3.csv('/btc.csv')
             .style("border-radius", "5px")
             .style("padding", "5px")
 
+        let sectionImg = monSVG.append('g').attr("id", "imgg")
+            .append("svg:image")
+            .attr("id", "imageTest")
+            .attr("opacity", 1)
+            .attr("width", width / 3)
+            .attr("height", width / 3)
+            .attr("x", 0)
+            .attr("y", 0)
+
+        let monImgModif = document.getElementById('imageTest')
+
+
+        let hoverNumberX = 0;
+        let hoverNumberY = 0;
+
+
         let mouseover = function (event, d, i) {
 
+
+            let idCercle = d3.select(this).attr("id")
             let prix = d3.select(this).attr("price")
             let srcTweet = d3.select(this).attr("linkTweet");
             let dateTweet = d3.select(this).attr("date");
             let tweetEmb = d3.select(this).attr("linkTweetEmb");
             console.log(prix)
-
-            /*            let tweet = divTest.append("blockquote")
-                       .attr("class" = "twitter-tweet")
-                       .append("p")
-                       .attr("lang"="en")
-                       .attr("dir" = "ltr")
-                       .text()
-            */
-
-            /*             twttr.widgets.load()
-                        twttr.widgets.load(
-                            document.getElementById("container")
-                          ); */
-
-            /*             Tooltip.attr("transform", "translate(" + d3.select(this).attr("cx") + "," + d3.select(this).attr("cy")); */
 
             const options = { year: 'numeric', month: 'long', day: 'numeric' };
             let dateJolie = new Date(dateTweet);
@@ -304,42 +307,64 @@ d3.csv('/btc.csv')
                 .style("top", event.pageY - 80 + "px")
                 .style("opacity", 1)
                 .html(dateJolie2 + "<br>" + "₿itcoin : " + prix + " Chf" /* + "<br>" + srcTweet + "<br>" + dateTweet + "<br>" + tweetEmb */)
-            /* 
-                        let mouseX = event.pageX;
-                        let mouseY = event.pageY; */
-            let mouseX = d3.select(this).attr("cx");
-            let mouseY = d3.select(this).attr("cy");
 
-            monSVG.append('g').attr("id", "img")
-                .append("svg:image")
-                .attr("xlink:href", srcTweet)
-                .attr("width", width / 3)
-                .attr("height", width / 3)
-                .attr("x", whereIsMouseX(mouseX))
-                .attr("y", whereIsMouseY(mouseY))
-                .on('click', clickit, true);
+            let mouseX = event.pageX;
+            let mouseY = event.pageY;
+            /*             let mouseX = d3.select(this).attr("cx");
+                        let mouseY = d3.select(this).attr("cy"); */
+
+            /*             monSVG.append('g').attr("id", "img")
+                            .append("svg:image")
+                            .attr("xlink:href", srcTweet)
+                            .attr("width", width / 3)
+                            .attr("height", width / 3)
+                            .attr("x", whereIsMouseX(mouseX))
+                            .attr("y", whereIsMouseY(mouseY))
+                            .on('click', clickit, true); */
+
+            let mouseX2 = whereIsMouseX(mouseX);
+            let mouseY2 = whereIsMouseY(mouseY);
+
+
+            monImgModif.setAttribute("href", srcTweet);
+            monImgModif.setAttribute("x", mouseX2);
+            monImgModif.setAttribute("y", mouseY2);
+
+
+            sectionImg.transition().duration(10).style("opacity", 1);
+            sectionImg.on('click', clickit, true);
 
             function clickit(link = tweetEmb) {
                 window.open(tweetEmb);
             }
 
+            let idLastTime = 10;
+            let idRecu;
 
             function whereIsMouseX(x) {
+
                 console.log("x", x);
                 console.log("width", width)
                 let x2;
-                if (x > (width / 2)) { x2 = parseInt(x - width / 3) }
-                else if (x < (width / 2)) { x2 = parseInt(x + width / 2) }
+                if (x > (width / 3 * 2)) { x2 = parseInt(x - width / 2) }
+                else if (x < (width / 3)) { x2 = parseInt(x + width / 5) }
+                else { x2 = parseInt(x + width / 10) }
                 return x2;
+
+
             }
 
             function whereIsMouseY(y) {
+
                 console.log("y", y)
                 console.log("height", height)
                 let y2;
-                if (y > (height / 2)) { y2 = parseInt(y - height / 2) }
-                else if (y < (height / 2)) { y2 = parseInt(y + height / 2) }
+                if (y > (height / 3 * 2)) { y2 = parseInt(y - height / 2) }
+                else if (y < (height / 3)) { y2 = parseInt(y + height / 20) }
+                else { y2 = parseInt(y + height / 15) }
                 return y2;
+
+
             }
         }
 
@@ -359,12 +384,14 @@ d3.csv('/btc.csv')
 
         let mouseleave = function (d, i) {
             Tooltip
-                /*                 .style("opacity", 0) */
-                .transition().duration(800).style("opacity", 0);
+                .transition().duration(300).style("opacity", 0)
 
+            sectionImg.transition().duration(1000).style("opacity", 0)
 
+            hoverNumberY = 0;
+            hoverNumberX = 0;
 
-            d3.selectAll("#img").transition().duration(500).remove();
+            /*             d3.selectAll("#img").transition().duration(500).remove(); */
 
 
         }
@@ -522,7 +549,13 @@ function matcherDatesTabPrixBtcEtTabTweet(dataTweet, tabPrixBTC) {
     dataTweet.forEach((e) => {
 
         let found = tabPrixBTC.find(el => el.date == e.date);
-        tabCroise.push({ date: found.date, prix_btc: found.prix_btc, marketCap: found.marketCap, src: e.src, linkTweet: e.linkTweet });
+        tabCroise.push({
+            date: found.date,
+            prix_btc: found.prix_btc,
+            marketCap: found.marketCap,
+            src: e.src,
+            linkTweet: e.linkTweet
+        });
 
     })
     return tabCroise;
