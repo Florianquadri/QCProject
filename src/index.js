@@ -137,20 +137,6 @@ d3.csv('/btc.csv')
 
         }
 
-        d3.select('body').on('scroll', function () {
-            //if id choisi est le last, on revient au début
-            if (idChoisi < datasTweetFinal.length - 1) {
-                idChoisi++;
-                zoomToPoint(idChoisi);
-            }
-
-            else {
-                monSVG.transition().duration(750).call(zoom.transform, d3.zoomIdentity.scale(1));
-                idChoisi = -1;
-            }
-
-        })
-
         const divTest = d3.select("#testDonnees");
         const monBody = d3.select("body")
         const divBouton = monBody.append("div")
