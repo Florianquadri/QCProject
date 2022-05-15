@@ -1,5 +1,7 @@
 import * as d3 from 'd3';
-import { retourneTabTweet } from './dataTweet.js'
+import { retourneTabTweet } from './dataTweet.js';
+import TwitterComponent from 'twitter-component';
+
 //https://www.youtube.com/watch?v=T1X6qQt9ONg pour le crash
 // div sur graphique et non en bas / animation / flèche détectant direction dans graphique / charte devant graphe
 d3.select('body').style("background-color", "black")
@@ -96,12 +98,15 @@ d3.csv('/btc.csv')
             .on("click", (d, event) => {
                 console.log("letsgo");
 
+                if (idChoisi != -1) {
+                    idChoisi = -1;
+                }
                 idChoisi++;
                 zoomToPoint(idChoisi);
                 /*      mouseover(1); */
 
-                d3.selectAll("#img").transition().duration(200).remove();
-                setTimeout(ajouteImg, 50000)
+                tweetos.transition().duration(700).style("opacity", 0);
+                setTimeout(ajouteImg, 500)
 
             })
 
@@ -111,7 +116,7 @@ d3.csv('/btc.csv')
 
             //je positionne le zoom sur le premier cercle (id == 0)
 
-            let xStart = parseFloat(xyStart.getAttribute("cx"));
+            let xStart = parseFloat(xyStart.getAttribute("cx")) - width / 30;
             let yStart = parseFloat(xyStart.getAttribute("cy"));
             console.log("X:", xStart, "Y:", yStart)
 
@@ -133,6 +138,9 @@ d3.csv('/btc.csv')
                     .transition()
                     .duration(500)
                     .call(zoom.translateTo, xStart, yStart)
+                /*                     if (!d3.zoomIdentity.scale(5)) {
+                                        monSVG.transition().duration(500).call(zoom.scaleTo, 5);
+                                    } */
             }
 
         }
@@ -282,6 +290,7 @@ d3.csv('/btc.csv')
             let srcTweet = d3.select(this).attr("linkTweet");
             let dateTweet = d3.select(this).attr("date");
             let tweetEmb = d3.select(this).attr("linkTweetEmb");
+
             console.log(prix)
 
             const options = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -296,36 +305,23 @@ d3.csv('/btc.csv')
 
             let mouseX = event.pageX;
             let mouseY = event.pageY;
-            /*             let mouseX = d3.select(this).attr("cx");
-                        let mouseY = d3.select(this).attr("cy"); */
-
-            /*             monSVG.append('g').attr("id", "img")
-                            .append("svg:image")
-                            .attr("xlink:href", srcTweet)
-                            .attr("width", width / 3)
-                            .attr("height", width / 3)
-                            .attr("x", whereIsMouseX(mouseX))
-                            .attr("y", whereIsMouseY(mouseY))
-                            .on('click', clickit, true); */
 
             let mouseX2 = whereIsMouseX(mouseX);
             let mouseY2 = whereIsMouseY(mouseY);
 
+            let tweet = new TwitterComponent();
+            const tweetDom = document.getElementById("tweet");
+            tweetDom.replaceChildren(tweet.render(tweetEmb));
+            tweetDom.style.display = "block";
+            tweetDom.style.opacity = 1;
+            /*             tweetDom.style.left = mouseX2 + "px";
+                        tweetDom.style.top = mouseY2 + "px"; */
+            tweetDom.style.left = width / 10 + "px";
+            tweetDom.style.top = height / 100 * 5 + "px";
 
-            monImgModif.setAttribute("href", srcTweet);
-            monImgModif.setAttribute("x", mouseX2);
-            monImgModif.setAttribute("y", mouseY2);
-
-
-            sectionImg.transition().duration(10).style("opacity", 1);
-            sectionImg.on('click', clickit, true);
-
-            function clickit(link = tweetEmb) {
-                window.open(tweetEmb);
-            }
-
-            let idLastTime = 10;
-            let idRecu;
+            /*             function clickit(link = tweetEmb) {
+                            window.open(tweetEmb);
+                        } */
 
             function whereIsMouseX(x) {
 
@@ -336,7 +332,6 @@ d3.csv('/btc.csv')
                 else if (x < (width / 3)) { x2 = parseInt(x + width / 5) }
                 else { x2 = parseInt(x + width / 10) }
                 return x2;
-
 
             }
 
@@ -350,30 +345,17 @@ d3.csv('/btc.csv')
                 else { y2 = parseInt(y + height / 15) }
                 return y2;
 
-
             }
         }
 
-        let mousemove = function (event, d, i) {
-            let dateTweet = d3.select(this).attr("date");
-            let prix = d3.select(this).attr("price")
-            let srcTweet = d3.select(this).attr("linkTweet");
-            let tweetEmb = d3.select(this).attr("linkTweetEmb");
-
-
-            Tooltip.html(d)
-                .style("left", event.pageX - 50 + "px")
-                .style("top", event.pageY - 80 + "px")
-                .style("opacity", 1)
-                .html("Prix BTC: " + prix + "<br>" + "Date : " + dateTweet /* + "<br>" + srcTweet + "<br>" + dateTweet + "<br>" + tweetEmb */)
-        }
+        let tweetos = d3.select("#tweet");
 
         let mouseleave = function (d, i) {
             Tooltip
                 .transition().duration(300).style("opacity", 0)
 
-            sectionImg.transition().duration(1000).style("opacity", 0)
-
+            /*  sectionImg.transition().duration(1000).style("opacity", 0) */
+            tweetos.transition().duration(750).style("opacity", 0);
             hoverNumberY = 0;
             hoverNumberX = 0;
 
@@ -396,7 +378,7 @@ d3.csv('/btc.csv')
             .data(datasTweetFinal)
             .enter()
             .append("circle")
-            .attr("class", "myCircle")
+            .attr("class", function (d, i) { return "myCircle c" + i })
             //id permettant au zoom de se déplacer au scroll d'un point à un autre
             .attr("id", function (d, i) { return i })
             .attr("cx", function (d) { return echelleDate(d3.timeParse("%Y-%m-%d")(d.date)) })
@@ -457,26 +439,28 @@ d3.csv('/btc.csv')
             if (e.key === "q") { // left  
                 idChoisi = -1;
                 monSVG.transition().duration(750).call(zoom.transform, d3.zoomIdentity.scale(1));
-                d3.selectAll("#img").transition().duration(200).remove();
+                tweetos.transition().duration(1000).style("opacity", 0);
             }
             else if (e.key === "ArrowRight") { // left     
-                //translateTo
-                console.log("droite");
 
                 if (idChoisi < datasTweetFinal.length - 1) {
+
                     idChoisi++;
+                    d3.selectAll(".myCircle").style("fill", "white")
+                    let cercleLie = d3.select(".c" + idChoisi)
+                    cercleLie.style("fill", "gold")
+
+
                     zoomToPoint(idChoisi);
-                    /*      mouseover(1); */
-
-                    d3.selectAll("#img").transition().duration(200).remove();
-                    setTimeout(ajouteImg, 500)
-
+                    tweetos.transition().duration(700).style("opacity", 0);
+                    ajouteImg();
 
                 }
                 else {
                     monSVG.transition().duration(750).call(zoom.transform, d3.zoomIdentity.scale(1));
-                    d3.selectAll("#img").transition().duration(200).remove();
+                    tweetos.transition().duration(1000).style("opacity", 0);
                     idChoisi = -1;
+                    d3.selectAll(".myCircle").style("fill", "white")
                 }
 
                 /*   monSVG.transition().duration(750).call(zoom.transform, d3.zoomIdentity.translate(100, 200)); */
@@ -488,12 +472,16 @@ d3.csv('/btc.csv')
                 console.log("gauche");
                 if (idChoisi > 0) {
                     idChoisi--;
+                    d3.selectAll(".myCircle").style("fill", "white")
+                    let cercleLie = d3.select(".c" + idChoisi)
+                    cercleLie.style("fill", "gold")
                     zoomToPoint(idChoisi);
-                    d3.selectAll("#img").transition().duration(200).remove();
+                    tweetos.transition().duration(700).style("opacity", 0);
                     setTimeout(ajouteImg, 500)
                 } else {
                     monSVG.transition().duration(750).call(zoom.transform, d3.zoomIdentity.scale(1));
-                    d3.selectAll("#img").transition().duration(200).remove();
+                    tweetos.transition().duration(1000).style("opacity", 0);
+                    d3.selectAll(".myCircle").style("fill", "white")
                     idChoisi = -1;
                 }
 
@@ -505,19 +493,27 @@ d3.csv('/btc.csv')
         });
 
         function ajouteImg(id = idChoisi) {
-            monSVG.append('g').attr("id", "img")
-                .append("svg:image")
-                .attr("xlink:href", function (d) {
-                    return datasTweetFinal[idChoisi].src;
-                })
-                .attr("width", width / 3)
-                .attr("height", width / 3)
-                .attr("x", width / 3)
-                .attr("y", height / 10)
-                .on("click", function (d) {
-                    ouvreTweet(datasTweetFinal[idChoisi].linkTweet)
-                });
-            console.log(datasTweetFinal[idChoisi].linkTweet)
+
+            if (id == 0) {
+                setTimeout(createTweet, 500)
+            } else {
+                createTweet()
+            }
+
+            function createTweet() {
+
+                let tweet = new TwitterComponent();
+                let tweetEmb = datasTweetFinal[idChoisi].linkTweet;
+                const tweetDom = document.getElementById("tweet");
+                tweetDom.replaceChildren(tweet.render(tweetEmb));
+                tweetDom.style.left = width / 2.5 + "px";
+                tweetDom.style.top = height / 3.5 + "px";
+                tweetos.transition().duration(700).style("opacity", 1);
+
+            }
+
+
+
         }
 
         function ouvreTweet(pageTweet) {
@@ -548,4 +544,3 @@ function matcherDatesTabPrixBtcEtTabTweet(dataTweet, tabPrixBTC) {
 
 }
 
-//faire zoom pour voir + détaillé (date + proche) et faire scroll pour avancer puis faire apparaître tweet
